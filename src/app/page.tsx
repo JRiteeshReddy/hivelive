@@ -82,48 +82,48 @@ export default function LandingPage() {
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center mb-8"
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center mb-10 select-none z-10"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-yellow-300 font-medium text-sm mb-4 shadow-inner">
-            <Sparkles className="h-4 w-4" /> Live Engagement Platform
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-yellow-400/90 font-semibold text-xs tracking-wider uppercase mb-5 shadow-2xl backdrop-blur-md">
+            <Sparkles className="h-3.5 w-3.5 text-orange-500 animate-pulse" /> Live Engagement Platform
           </div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tight text-white drop-shadow-md">
-            HIVE<span className="text-yellow-300">Live</span>
+          <h1 className="text-7xl md:text-8xl font-black tracking-tight leading-none bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(249,115,22,0.2)]">
+            HIVE<span className="text-white">Live</span>
           </h1>
-          <p className="text-zinc-200 mt-2 text-lg md:text-xl font-medium max-w-md mx-auto">
-            Interact with your audience in real time. Perfect for seminars, workshops, and college events.
+          <p className="text-zinc-400 mt-4 text-base md:text-lg font-medium max-w-sm mx-auto leading-relaxed">
+            Real-time interactive audience hub for college events, workshops, and seminars.
           </p>
         </motion.div>
 
         {/* Content Container */}
-        <div className="w-full max-w-md min-h-[320px] flex items-stretch">
+        <div className="w-full max-w-md min-h-[320px] flex items-stretch z-10">
           <AnimatePresence mode="wait">
             {flow === "menu" && (
               <motion.div
                 key="menu"
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
                 className="w-full flex flex-col gap-4"
               >
-                <GlassCard className="flex flex-col gap-6 justify-center flex-grow p-8">
+                <GlassCard className="flex flex-col gap-5 justify-center flex-grow p-8 border-white/5 bg-zinc-950/30">
                   {/* Create Event Button */}
                   <Button
                     onClick={() => setFlow("create")}
-                    className="w-full py-8 text-xl font-bold bg-white text-zinc-950 hover:bg-zinc-100 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 rounded-2xl shadow-xl flex items-center justify-center gap-3 cursor-pointer group"
+                    className="w-full py-7 text-lg font-bold bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 rounded-xl shadow-[0_0_30px_rgba(249,115,22,0.25)] hover:shadow-[0_0_35px_rgba(249,115,22,0.45)] border border-orange-400/20 flex items-center justify-center gap-3 cursor-pointer group"
                   >
-                    <PlusCircle className="h-6 w-6 text-orange-600 transition-transform group-hover:rotate-90" />
+                    <PlusCircle className="h-5 w-5 text-white transition-transform group-hover:rotate-90" />
                     Create Event
                   </Button>
 
                   {/* Join Event Button */}
                   <Button
                     onClick={() => setFlow("join")}
-                    className="w-full py-8 text-xl font-bold bg-zinc-950/40 hover:bg-zinc-950/60 border border-white/20 text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 rounded-2xl shadow-xl flex items-center justify-center gap-3 cursor-pointer"
+                    className="w-full py-7 text-lg font-bold bg-white/5 hover:bg-white/10 border border-white/10 hover:border-yellow-400/30 text-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.2)] hover:shadow-[0_0_30px_rgba(253,224,71,0.15)] flex items-center justify-center gap-3 cursor-pointer"
                   >
-                    <Users className="h-6 w-6 text-yellow-300" />
+                    <Users className="h-5 w-5 text-yellow-400" />
                     Join Event
                   </Button>
                 </GlassCard>
@@ -133,17 +133,19 @@ export default function LandingPage() {
             {flow === "join" && (
               <motion.div
                 key="join"
-                initial={{ opacity: 0, x: 50 }}
+                initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ type: "spring", stiffness: 380, damping: 28 }}
                 className="w-full"
               >
-                <GlassCard className="p-8">
-                  <h2 className="text-3xl font-extrabold text-white mb-6">Join Event</h2>
-                  <form onSubmit={handleJoinSubmit} className="space-y-4">
+                <GlassCard className="p-8 border-white/5 bg-zinc-950/30">
+                  <h2 className="text-3xl font-black text-white mb-2">Join Event</h2>
+                  <p className="text-zinc-400 text-sm mb-6">Enter the 5-digit event code to join the interactive session.</p>
+                  
+                  <form onSubmit={handleJoinSubmit} className="space-y-5">
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-zinc-300">Enter Event Code</label>
+                      <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Event Code</label>
                       <Input
                         type="text"
                         maxLength={5}
@@ -153,13 +155,13 @@ export default function LandingPage() {
                           const val = e.target.value.replace(/\D/g, "");
                           setEventCodeInput(val);
                         }}
-                        className="glass-input h-14 text-center text-3xl font-mono tracking-widest rounded-xl focus-visible:ring-2 focus-visible:ring-yellow-300"
+                        className="glass-input h-14 text-center text-4xl font-black font-mono tracking-[0.25em] rounded-xl focus-visible:ring-2 focus-visible:ring-orange-500/50"
                         autoFocus
                       />
                     </div>
 
                     {joinError && (
-                      <div className="flex items-center gap-2 text-red-400 text-sm p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                      <div className="flex items-center gap-2 text-red-400 text-sm p-3.5 rounded-xl bg-red-500/10 border border-red-500/20">
                         <AlertCircle className="h-4 w-4 shrink-0" />
                         <span>{joinError}</span>
                       </div>
@@ -174,16 +176,16 @@ export default function LandingPage() {
                           setJoinError("");
                           setEventCodeInput("");
                         }}
-                        className="w-1/3 border-white/10 hover:bg-white/10 text-white"
+                        className="w-1/3 border-white/10 hover:bg-white/10 text-white rounded-xl h-12 font-bold cursor-pointer"
                       >
                         Back
                       </Button>
                       <Button
                         type="submit"
                         disabled={eventCodeInput.length !== 5 || isVerifying}
-                        className="w-2/3 bg-yellow-300 hover:bg-yellow-400 text-zinc-950 font-bold flex items-center justify-center gap-2"
+                        className="w-2/3 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold rounded-xl h-12 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(249,115,22,0.2)] cursor-pointer"
                       >
-                        {isVerifying ? "Verifying..." : "Join"}
+                        {isVerifying ? "Verifying..." : "Join Event"}
                         <ArrowRight className="h-4 w-4" />
                       </Button>
                     </div>
@@ -195,22 +197,22 @@ export default function LandingPage() {
             {flow === "create" && (
               <motion.div
                 key="create"
-                initial={{ opacity: 0, x: -50 }}
+                initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 50 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                exit={{ opacity: 0, x: 30 }}
+                transition={{ type: "spring", stiffness: 380, damping: 28 }}
                 className="w-full"
               >
-                <GlassCard className="p-8">
-                  <h2 className="text-3xl font-extrabold text-white mb-2">Configure Identity</h2>
-                  <p className="text-zinc-300 text-sm mb-6">
-                    Customize what participants need to fill out in order to join the event.
+                <GlassCard className="p-8 border-white/5 bg-zinc-950/30">
+                  <h2 className="text-3xl font-black bg-gradient-to-r from-orange-400 to-yellow-300 bg-clip-text text-transparent mb-2">Configure Event</h2>
+                  <p className="text-zinc-400 text-sm mb-6">
+                    Customize what participants need to fill out in order to join the live session.
                   </p>
 
-                  <form onSubmit={handleCreateSubmit} className="space-y-4">
+                  <form onSubmit={handleCreateSubmit} className="space-y-5">
                     {/* Identifier Label */}
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-zinc-300 flex items-center gap-1.5">
+                      <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
                         Input Label Text
                       </label>
                       <Input
@@ -218,35 +220,35 @@ export default function LandingPage() {
                         placeholder="e.g. Enter your Roll Number"
                         value={label}
                         onChange={(e) => setLabel(e.target.value)}
-                        className="glass-input h-11"
+                        className="glass-input h-12 text-sm rounded-xl focus-visible:ring-2 focus-visible:ring-orange-500/50"
                         required
                       />
                     </div>
 
                     {/* Identifier Placeholder */}
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-zinc-300">Input Placeholder Text</label>
+                      <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Input Placeholder Text</label>
                       <Input
                         type="text"
                         placeholder="e.g. 2021BCS012"
                         value={placeholder}
                         onChange={(e) => setPlaceholder(e.target.value)}
-                        className="glass-input h-11"
+                        className="glass-input h-12 text-sm rounded-xl focus-visible:ring-2 focus-visible:ring-orange-500/50"
                         required
                       />
                     </div>
 
                     {/* Input Field Type */}
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-zinc-300">Input Field Type</label>
+                      <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Input Field Type</label>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
                           onClick={() => setInputType("text")}
-                          className={`py-2 rounded-lg border text-sm font-medium transition-all ${
+                          className={`py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                             inputType === "text"
-                              ? "bg-white text-zinc-950 border-white"
-                              : "bg-white/5 text-zinc-300 border-white/10 hover:bg-white/10"
+                              ? "bg-gradient-to-r from-orange-600 to-amber-500 text-white border-transparent shadow-[0_0_15px_rgba(249,115,22,0.15)] font-black"
+                              : "bg-white/5 text-zinc-300 border-white/10 hover:bg-white/10 hover:border-yellow-400/20"
                           }`}
                         >
                           Text Input
@@ -254,10 +256,10 @@ export default function LandingPage() {
                         <button
                           type="button"
                           onClick={() => setInputType("number")}
-                          className={`py-2 rounded-lg border text-sm font-medium transition-all ${
+                          className={`py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
                             inputType === "number"
-                              ? "bg-white text-zinc-950 border-white"
-                              : "bg-white/5 text-zinc-300 border-white/10 hover:bg-white/10"
+                              ? "bg-gradient-to-r from-orange-600 to-amber-500 text-white border-transparent shadow-[0_0_15px_rgba(249,115,22,0.15)] font-black"
+                              : "bg-white/5 text-zinc-300 border-white/10 hover:bg-white/10 hover:border-yellow-400/20"
                           }`}
                         >
                           Number Input
@@ -270,7 +272,7 @@ export default function LandingPage() {
                         type="button"
                         variant="outline"
                         onClick={() => setFlow("menu")}
-                        className="w-1/3 border-white/10 hover:bg-white/10 text-white"
+                        className="w-1/3 border-white/10 hover:bg-white/10 text-white rounded-xl h-12 font-bold cursor-pointer"
                         disabled={isGenerating}
                       >
                         Back
@@ -278,7 +280,7 @@ export default function LandingPage() {
                       <Button
                         type="submit"
                         disabled={isGenerating}
-                        className="w-2/3 bg-yellow-300 hover:bg-yellow-400 text-zinc-950 font-bold"
+                        className="w-2/3 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold rounded-xl h-12 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(249,115,22,0.2)] cursor-pointer"
                       >
                         {isGenerating ? "Generating..." : "Generate Event"}
                       </Button>
