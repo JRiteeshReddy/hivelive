@@ -254,7 +254,11 @@ export default function ModeratorDashboardPage({ params }: PageProps) {
                           </span>
                         </div>
                         <span className="text-[10px] text-zinc-400 font-mono">
-                          {new Date(res.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                          {(() => {
+                            if (!res.submittedAt) return "";
+                            const d = (res.submittedAt as any).toDate ? (res.submittedAt as any).toDate() : new Date(res.submittedAt);
+                            return isNaN(d.getTime()) ? "" : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                          })()}
                         </span>
                       </div>
 

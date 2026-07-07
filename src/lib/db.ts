@@ -653,6 +653,11 @@ export async function moderateResponse(
     const idx = responses.findIndex((r) => r.id === responseId);
     if (idx !== -1) {
       responses[idx].moderationStatus = status;
+      if (status === "approved") {
+        responses[idx].isRevealed = true;
+        responses[idx].isIdentityRevealed = true;
+        responses[idx].revealedAt = new Date().toISOString();
+      }
       saveMockData(`hive_responses_${eventCode}`, responses);
       notifyMockListeners(`responses_${eventCode}`, responses);
       
@@ -665,7 +670,16 @@ export async function moderateResponse(
   }
   try {
     const responseRef = doc(db, "events", eventCode, "responses", responseId);
-    await updateDoc(responseRef, { moderationStatus: status });
+    if (status === "approved") {
+      await updateDoc(responseRef, { 
+        moderationStatus: status,
+        isRevealed: true,
+        isIdentityRevealed: true,
+        revealedAt: serverTimestamp()
+      });
+    } else {
+      await updateDoc(responseRef, { moderationStatus: status });
+    }
   } catch (error) {
     console.error("Error moderating response:", error);
   }

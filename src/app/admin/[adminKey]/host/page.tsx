@@ -132,8 +132,14 @@ export default function HostDashboardPage({ params }: PageProps) {
   };
 
   // Launch Question
-  const handleLaunch = async (questionId: string) => {
+  const handleLaunch = async (questionId: string, isReLaunch = false) => {
     if (!eventData) return;
+    if (isReLaunch) {
+      const confirmLaunch = window.confirm(
+        "You have already launched this question once. Do you want to launch it again?"
+      );
+      if (!confirmLaunch) return;
+    }
     await launchQuestion(eventData.eventCode, questionId);
   };
 
@@ -387,24 +393,28 @@ export default function HostDashboardPage({ params }: PageProps) {
 
                     <div className="flex items-center gap-2 shrink-0">
                       {q.status === "completed" && (
-                        <span className="text-xs text-zinc-400 font-bold bg-white/5 border border-white/5 px-2 py-1 rounded">
+                        <span className="text-xs text-zinc-400 font-bold bg-white/5 border border-white/5 px-2 py-1.5 rounded">
                           Completed
                         </span>
                       )}
                       
-                      {eventData.activeQuestionId !== q.id && q.status !== "completed" && (
+                      {eventData.activeQuestionId !== q.id && (
                         <Button
-                          onClick={() => handleLaunch(q.id)}
+                          onClick={() => handleLaunch(q.id, q.status !== "draft")}
                           size="sm"
-                          className="bg-yellow-300 hover:bg-yellow-400 text-zinc-950 font-bold flex items-center gap-1"
+                          className={`font-bold flex items-center gap-1 h-8 ${
+                            q.status !== "draft"
+                              ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-300 border border-white/5"
+                              : "bg-yellow-300 hover:bg-yellow-400 text-zinc-950"
+                          }`}
                         >
                           <Play className="h-3.5 w-3.5 fill-current" />
-                          Launch
+                          {q.status !== "draft" ? "Re-launch" : "Launch"}
                         </Button>
                       )}
 
                       {eventData.activeQuestionId === q.id && (
-                        <span className="text-xs text-green-400 font-bold bg-green-500/10 border border-green-500/20 px-2 py-1 rounded animate-pulse">
+                        <span className="text-xs text-green-400 font-bold bg-green-500/10 border border-green-500/20 px-2 py-1.5 rounded animate-pulse">
                           Active
                         </span>
                       )}
@@ -506,7 +516,11 @@ export default function HostDashboardPage({ params }: PageProps) {
                         ))}
                       </div>
                       <span className="text-[10px] text-zinc-400 font-mono">
-                        {new Date(res.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {(() => {
+                          if (!res.submittedAt) return "";
+                          const d = (res.submittedAt as any).toDate ? (res.submittedAt as any).toDate() : new Date(res.submittedAt);
+                          return isNaN(d.getTime()) ? "" : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        })()}
                       </span>
                     </div>
 
