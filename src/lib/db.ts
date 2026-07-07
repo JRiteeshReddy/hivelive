@@ -17,7 +17,17 @@ import {
 } from "firebase/firestore";
 import { EventData, QuestionData, ParticipantData, ResponseData, ParticipantIdentifierConfig } from "./types";
 
-const IS_MOCK = !db || process.env.NEXT_PUBLIC_FIREBASE_API_KEY === "mock-api-key";
+const getIsMock = () => {
+  if (!db) return true;
+  try {
+    const apiKey = (db as any).app?.options?.apiKey;
+    return !apiKey || apiKey === "mock-api-key" || apiKey.includes("your_api_key_here");
+  } catch (e) {
+    return true;
+  }
+};
+
+const IS_MOCK = getIsMock();
 
 // --- MOCK DATABASE SETUP (LOCAL STORAGE + CROSS-TAB EMITTER) ---
 
