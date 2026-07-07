@@ -17,7 +17,19 @@ import {
 } from "firebase/firestore";
 import { EventData, QuestionData, ParticipantData, ResponseData, ParticipantIdentifierConfig } from "./types";
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error(errorMessage)), timeoutMs)
+    )
+  ]);
+}
+
 const getIsMock = () => {
+  if (typeof window !== "undefined" && localStorage.getItem("hive_force_local_mode") === "true") {
+    return true;
+  }
   if (!db) return true;
   try {
     const apiKey = (db as any).app?.options?.apiKey;
@@ -30,7 +42,8 @@ const getIsMock = () => {
 const IS_MOCK = getIsMock();
 
 export function isMockMode(): boolean {
-  return IS_MOCK;
+  // Recalculate runtime status in case fallback occurred
+  return getIsMock();
 }
 
 // --- MOCK DATABASE SETUP (LOCAL STORAGE + CROSS-TAB EMITTER) ---
@@ -105,15 +118,23 @@ export function generateAdminKey(): string {
 
 // Check if an event exists by event code
 export async function checkEventExists(eventCode: string): Promise<boolean> {
-  if (IS_MOCK) {
+  if (isMockMode()) {
     const event = getMockData<EventData | null>(`hive_event_${eventCode}`, null);
     return event !== null;
   }
   try {
-    const eventDoc = await getDoc(doc(db, "events", eventCode));
+    const checkPromise = getDoc(doc(db, "events", eventCode));
+    const eventDoc = await withTimeout(checkPromise, 4000, "Firestore timeout");
     return eventDoc.exists();
   } catch (error) {
-    console.error("Error checking event existence:", error);
+    console.error("Error checking event existence in Firestore:", error);
+    // If it times out or errors, check local storage as fallback
+    const localEvent = getMockData<EventData | null>(`hive_event_${eventCode}`, null);
+    if (localEvent) {
+      console.warn("Firestore check failed. Local storage fallback match found. Activating force local mode.");
+      localStorage.setItem("hive_force_local_mode", "true");
+      return true;
+    }
     return false;
   }
 }
@@ -124,7 +145,7 @@ export async function createEvent(
   adminKey: string,
   identifierConfig: ParticipantIdentifierConfig
 ): Promise<boolean> {
-  if (IS_MOCK) {
+  if (isMockMode()) {
     const newEvent: EventData = {
       eventCode,
       adminKey,
@@ -143,6 +164,8 @@ export async function createEvent(
     saveMockData(`hive_admin_lookup_${adminKey}`, eventCode);
     return true;
   }
+  
+  // Try to write to Firestore with 4-second timeout
   try {
     const eventRef = doc(db, "events", eventCode);
     const newEvent: EventData = {
@@ -154,28 +177,59 @@ export async function createEvent(
       activeQuestionId: null,
       activeQuestionStatus: "waiting"
     };
-    await setDoc(eventRef, newEvent);
+    await withTimeout(setDoc(eventRef, newEvent), 4000, "Firestore write timeout");
     return true;
   } catch (error) {
-    console.error("Error creating event:", error);
-    return false;
+    console.error("Error creating event in Firestore (timeout/rules):", error);
+    console.warn("Automatically falling back to Local Storage Demo Mode.");
+    
+    // Force local mode in localStorage
+    localStorage.setItem("hive_force_local_mode", "true");
+    
+    // Save event locally
+    const newEvent: EventData = {
+      eventCode,
+      adminKey,
+      createdAt: new Date().toISOString(),
+      status: "active",
+      participantIdentifierConfig: identifierConfig,
+      activeQuestionId: null,
+      activeQuestionStatus: "waiting"
+    };
+    saveMockData(`hive_event_${eventCode}`, newEvent);
+    saveMockData(`hive_questions_${eventCode}`, []);
+    saveMockData(`hive_participants_${eventCode}`, []);
+    saveMockData(`hive_responses_${eventCode}`, []);
+    saveMockData(`hive_admin_lookup_${adminKey}`, eventCode);
+    
+    // Show alert explaining Vercel/Firestore issue, then proceed
+    alert("Firebase database connection timed out!\n\nThis usually means you haven't enabled the 'Firestore Database' service in your Firebase Console, or your security rules are blocking it.\n\nWe have automatically booted this session in local Demo Mode so you can keep testing. To fix this, open your Firebase Console and click 'Create Database' under Firestore.");
+    
+    return true;
   }
 }
 
 // Find event code by admin key
 export async function findEventByAdminKey(adminKey: string): Promise<string | null> {
-  if (IS_MOCK) {
+  if (isMockMode()) {
     return getMockData<string | null>(`hive_admin_lookup_${adminKey}`, null);
   }
   try {
     const q = query(collection(db, "events"), where("adminKey", "==", adminKey));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await withTimeout(getDocs(q), 4000, "Firestore fetch timeout");
     if (!querySnapshot.empty) {
       return querySnapshot.docs[0].id;
     }
-    return null;
+    // Check local storage if Firestore found nothing
+    return getMockData<string | null>(`hive_admin_lookup_${adminKey}`, null);
   } catch (error) {
-    console.error("Error finding event by admin key:", error);
+    console.error("Error finding event by admin key in Firestore:", error);
+    const localMatch = getMockData<string | null>(`hive_admin_lookup_${adminKey}`, null);
+    if (localMatch) {
+      console.warn("Firestore matching failed. Falling back to local storage admin match.");
+      localStorage.setItem("hive_force_local_mode", "true");
+      return localMatch;
+    }
     return null;
   }
 }
