@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, MessageSquare, AlertCircle, HelpCircle, Loader2, Send, CheckCircle2 } from "lucide-react";
-import { listenToEvent, joinParticipant, updateParticipantPresence, submitResponse } from "@/lib/db";
+import { listenToEvent, joinParticipant, updateParticipantPresence, submitResponse, isMockMode } from "@/lib/db";
 import { EventData, QuestionData } from "@/lib/types";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -217,6 +217,18 @@ export default function ParticipantPage({ params }: PageProps) {
               <p className="text-zinc-300 text-sm mt-2">
                 This event code is invalid or has ended. Double check the URL link and try again.
               </p>
+              
+              {isMockMode() && (
+                <div className="mt-4 flex flex-col gap-1.5 text-xs text-yellow-300 bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/20 text-left leading-normal">
+                  <span className="font-bold flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5" /> Demo Mode Notice
+                  </span>
+                  <span>
+                    This website is running in Demo Mode (no Firebase credentials set). Local events are only accessible on the device/browser tab they were created on.
+                  </span>
+                </div>
+              )}
+
               <Button
                 onClick={() => router.push("/")}
                 className="mt-6 bg-white hover:bg-zinc-100 text-zinc-950 font-bold"

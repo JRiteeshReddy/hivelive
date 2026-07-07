@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { 
   listenToEvent, listenToResponses, moderateResponse, 
-  toggleResponseStar, toggleResponseTag 
+  toggleResponseStar, toggleResponseTag, isMockMode 
 } from "@/lib/db";
 import { EventData, ResponseData } from "@/lib/types";
 
@@ -175,6 +175,23 @@ export default function ModeratorDashboardPage({ params }: PageProps) {
           </Button>
         </div>
       </nav>
+
+      {isMockMode() && (
+        <div className="w-full max-w-7xl mx-auto px-6 pt-6 z-10 shrink-0">
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/25 text-yellow-400 text-sm leading-normal">
+            <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold block text-yellow-300">Running in Demo Mode (Local Sync Only)</span>
+              <span className="text-zinc-300 text-xs mt-1 block leading-relaxed">
+                No Firebase database credentials were found on this environment. All data is saved locally to this browser. 
+                <strong> Participants on other devices (like mobile phones) or different browsers will not be able to join this event.</strong>
+                <br />
+                To enable cross-device participation, configure your Firebase environment variables on your hosting/Vercel dashboard.
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Moderator workspace grid */}
       <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 max-w-7xl w-full mx-auto z-10 items-start">

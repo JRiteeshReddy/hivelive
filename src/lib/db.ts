@@ -29,6 +29,10 @@ const getIsMock = () => {
 
 const IS_MOCK = getIsMock();
 
+export function isMockMode(): boolean {
+  return IS_MOCK;
+}
+
 // --- MOCK DATABASE SETUP (LOCAL STORAGE + CROSS-TAB EMITTER) ---
 
 // Listener registries for Mock mode
