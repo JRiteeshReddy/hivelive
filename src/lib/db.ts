@@ -145,6 +145,9 @@ export async function createEvent(
   adminKey: string,
   identifierConfig: ParticipantIdentifierConfig
 ): Promise<boolean> {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("hive_force_local_mode");
+  }
   if (isMockMode()) {
     const newEvent: EventData = {
       eventCode,

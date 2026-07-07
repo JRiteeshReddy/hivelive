@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { PlusCircle, Users, ArrowRight, Settings, Sparkles, AlertCircle, HelpCircle } from "lucide-react";
@@ -27,6 +27,13 @@ export default function LandingPage() {
   const [placeholder, setPlaceholder] = useState("e.g. Alice");
   const [inputType, setInputType] = useState<"text" | "number">("text");
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Reset force local mode when landing page loads to retry Firestore on next attempts
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("hive_force_local_mode");
+    }
+  }, []);
 
   // Handle Joining Event
   const handleJoinSubmit = async (e: React.FormEvent) => {
