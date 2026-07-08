@@ -18,7 +18,7 @@ import {
   listenToEvent, listenToQuestions, listenToParticipants, 
   listenToResponses, addQuestion, launchQuestion, 
   updateActiveQuestionStatus, revealResponse, revealResponseIdentity,
-  isMockMode
+  isMockMode, startActivity
 } from "@/lib/db";
 import { EventData, QuestionData, ParticipantData, ResponseData } from "@/lib/types";
 
@@ -134,6 +134,10 @@ export default function HostDashboardPage({ params }: PageProps) {
   // Launch Question
   const handleLaunch = async (questionId: string, isReLaunch = false) => {
     if (!eventData) return;
+    if (!eventData.activityStarted) {
+      alert("Please click 'Start Activity' first to begin the session and lock the lobby!");
+      return;
+    }
     if (isReLaunch) {
       const confirmLaunch = window.confirm(
         "You have already launched this question once. Do you want to launch it again?"
@@ -141,6 +145,12 @@ export default function HostDashboardPage({ params }: PageProps) {
       if (!confirmLaunch) return;
     }
     await launchQuestion(eventData.eventCode, questionId);
+  };
+
+  // Start Activity
+  const handleStartActivity = async () => {
+    if (!eventData) return;
+    await startActivity(eventData.eventCode);
   };
 
   // Manage Question Status
@@ -290,63 +300,84 @@ export default function HostDashboardPage({ params }: PageProps) {
         {/* Left Column: Controls & Questions (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
           {/* Active Question Control Panel */}
-          <GlassCard className="border-yellow-300/20">
-            <div className="flex justify-between items-start gap-4 mb-4">
-              <div>
-                <span className="text-xs font-bold text-yellow-300 uppercase tracking-widest">Active Question</span>
-                <h3 className="text-2xl font-black text-white mt-1 leading-snug">
-                  {eventData.activeQuestionId ? activeQuestionText : "No Question Launched"}
-                </h3>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold font-mono">
-                Status:{" "}
-                <span
-                  className={`capitalize font-bold ${
-                    eventData.activeQuestionStatus === "launched" ? "text-green-400" : "text-yellow-400"
-                  }`}
-                >
-                  {eventData.activeQuestionStatus}
-                </span>
-              </div>
-            </div>
-
-            {eventData.activeQuestionId && (
-              <div className="flex flex-wrap gap-2.5 pt-4 border-t border-white/10">
-                {eventData.activeQuestionStatus !== "launched" && (
-                  <Button
-                    onClick={() => handleLaunch(eventData.activeQuestionId!)}
-                    className="bg-green-600 hover:bg-green-700 text-white font-bold flex items-center gap-2"
-                  >
-                    <Play className="h-4 w-4" /> Resume / Launch
-                  </Button>
-                )}
-
-                {eventData.activeQuestionStatus === "launched" && (
-                  <Button
-                    onClick={() => handleStatusChange("paused")}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold flex items-center gap-2"
-                  >
-                    <Pause className="h-4 w-4" /> Pause
-                  </Button>
-                )}
-
+          {eventData.activityStarted !== true ? (
+            <GlassCard className="border-yellow-300/30 p-8">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                  <span className="text-xs font-bold text-yellow-300 uppercase tracking-widest bg-yellow-300/10 px-2.5 py-1 rounded border border-yellow-300/20">Lobby Mode</span>
+                  <h3 className="text-3xl font-black text-white mt-3">Lobby is Open</h3>
+                  <p className="text-zinc-400 text-sm mt-1 max-w-md">
+                    Participants can join the lobby now. Once you click **Start Activity**, the lobby locks and no new participants will be allowed to join.
+                  </p>
+                </div>
                 <Button
-                  onClick={() => handleStatusChange("ended")}
-                  className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-2"
+                  onClick={handleStartActivity}
+                  className="w-full md:w-auto bg-yellow-300 hover:bg-yellow-400 text-zinc-950 font-black text-lg h-12 px-6 rounded-xl shadow-lg shadow-yellow-300/10 flex items-center gap-2"
                 >
-                  <Square className="h-4 w-4" /> End Round
-                </Button>
-
-                <Button
-                  onClick={() => handleStatusChange("hidden")}
-                  variant="outline"
-                  className="border-white/10 hover:bg-white/10 text-white flex items-center gap-2"
-                >
-                  <EyeOff className="h-4 w-4" /> Hide from Screen
+                  <Play className="h-5 w-5 fill-current" />
+                  Start Activity
                 </Button>
               </div>
-            )}
-          </GlassCard>
+            </GlassCard>
+          ) : (
+            <GlassCard className="border-yellow-300/20 p-8">
+              <div className="flex justify-between items-start gap-4 mb-4">
+                <div>
+                  <span className="text-xs font-bold text-yellow-300 uppercase tracking-widest">Active Question</span>
+                  <h3 className="text-2xl font-black text-white mt-1 leading-snug">
+                    {eventData.activeQuestionId ? activeQuestionText : "No Question Launched"}
+                  </h3>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold font-mono">
+                  Status:{" "}
+                  <span
+                    className={`capitalize font-bold ${
+                      eventData.activeQuestionStatus === "launched" ? "text-green-400" : "text-yellow-400"
+                    }`}
+                  >
+                    {eventData.activeQuestionStatus}
+                  </span>
+                </div>
+              </div>
+
+              {eventData.activeQuestionId && (
+                <div className="flex flex-wrap gap-2.5 pt-4 border-t border-white/10">
+                  {eventData.activeQuestionStatus !== "launched" && (
+                    <Button
+                      onClick={() => handleLaunch(eventData.activeQuestionId!)}
+                      className="bg-green-600 hover:bg-green-700 text-white font-bold flex items-center gap-2"
+                    >
+                      <Play className="h-4 w-4" /> Resume / Launch
+                    </Button>
+                  )}
+
+                  {eventData.activeQuestionStatus === "launched" && (
+                    <Button
+                      onClick={() => handleStatusChange("paused")}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold flex items-center gap-2"
+                    >
+                      <Pause className="h-4 w-4" /> Pause
+                    </Button>
+                  )}
+
+                  <Button
+                    onClick={() => handleStatusChange("ended")}
+                    className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-2"
+                  >
+                    <Square className="h-4 w-4" /> End Round
+                  </Button>
+
+                  <Button
+                    onClick={() => handleStatusChange("hidden")}
+                    variant="outline"
+                    className="border-white/10 hover:bg-white/10 text-white flex items-center gap-2"
+                  >
+                    <EyeOff className="h-4 w-4" /> Hide from Screen
+                  </Button>
+                </div>
+              )}
+            </GlassCard>
+          )}
 
           {/* Question List and Queue builder */}
           <GlassCard>

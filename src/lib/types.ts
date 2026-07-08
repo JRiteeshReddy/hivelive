@@ -12,6 +12,7 @@ export interface EventData {
   participantIdentifierConfig: ParticipantIdentifierConfig;
   activeQuestionId: string | null;
   activeQuestionStatus: "waiting" | "launched" | "paused" | "ended" | "hidden";
+  activityStarted?: boolean;
 }
 
 export interface QuestionData {

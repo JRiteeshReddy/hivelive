@@ -156,7 +156,8 @@ export async function createEvent(
       status: "active",
       participantIdentifierConfig: identifierConfig,
       activeQuestionId: null,
-      activeQuestionStatus: "waiting"
+      activeQuestionStatus: "waiting",
+      activityStarted: false
     };
     saveMockData(`hive_event_${eventCode}`, newEvent);
     saveMockData(`hive_questions_${eventCode}`, []);
@@ -178,7 +179,8 @@ export async function createEvent(
       status: "active",
       participantIdentifierConfig: identifierConfig,
       activeQuestionId: null,
-      activeQuestionStatus: "waiting"
+      activeQuestionStatus: "waiting",
+      activityStarted: false
     };
     await withTimeout(setDoc(eventRef, newEvent), 4000, "Firestore write timeout");
     return true;
@@ -197,7 +199,8 @@ export async function createEvent(
       status: "active",
       participantIdentifierConfig: identifierConfig,
       activeQuestionId: null,
-      activeQuestionStatus: "waiting"
+      activeQuestionStatus: "waiting",
+      activityStarted: false
     };
     saveMockData(`hive_event_${eventCode}`, newEvent);
     saveMockData(`hive_questions_${eventCode}`, []);
@@ -543,6 +546,27 @@ export async function updateActiveQuestionStatus(
     return true;
   } catch (error) {
     console.error("Error updating active question status:", error);
+    return false;
+  }
+}
+
+// Start the quiz/activity (lobby locking)
+export async function startActivity(eventCode: string): Promise<boolean> {
+  if (isMockMode()) {
+    const event = getMockData<EventData | null>(`hive_event_${eventCode}`, null);
+    if (event) {
+      event.activityStarted = true;
+      saveMockData(`hive_event_${eventCode}`, event);
+      notifyMockListeners(`event_${eventCode}`, event);
+    }
+    return true;
+  }
+  try {
+    const eventRef = doc(db, "events", eventCode);
+    await updateDoc(eventRef, { activityStarted: true });
+    return true;
+  } catch (error) {
+    console.error("Error starting activity:", error);
     return false;
   }
 }
