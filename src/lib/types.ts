@@ -1,4 +1,4 @@
-export interface ParticipantIdentifierConfig {
+  export interface ParticipantIdentifierConfig {
   label: string;
   placeholder: string;
   type: "text" | "number";

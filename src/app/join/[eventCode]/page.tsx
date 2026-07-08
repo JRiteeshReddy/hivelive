@@ -69,10 +69,10 @@ export default function ParticipantPage({ params }: PageProps) {
 
   // 2. Fetch Active Question details when activeQuestionId changes
   useEffect(() => {
+    setResponseAnswer("");
     if (!eventData || !eventData.activeQuestionId) {
       setActiveQuestion(null);
       setHasSubmittedActive(false);
-      setResponseAnswer("");
       return;
     }
 
