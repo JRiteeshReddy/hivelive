@@ -153,3 +153,29 @@
   border-color: rgba(254, 215, 26, 0.4);
   box-shadow: 0 0 15px rgba(254, 215, 26, 0.1);
 }
+
+/* Custom Cyber-Dark Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(254, 215, 26, 0.35); /* Glow neon-yellow on hover */
+}
+
+/* Firefox compatibility */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) rgba(0, 0, 0, 0.15);
+}
